@@ -1,8 +1,7 @@
 require 'spec_helper'
 
-include FileTestHelper
-describe "Preforker" do
-  sandboxed_it "should quit gracefully" do
+describe "Preforker", :integration do
+  it "should quit gracefully" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -17,7 +16,7 @@ describe "Preforker" do
     log.should =~ /Main loop ended. Dying/
   end
 
-  sandboxed_it "shouldn't quit gracefully on term signal" do
+  it "shouldn't quit gracefully on term signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -31,7 +30,7 @@ describe "Preforker" do
     log.should_not =~ /Main loop ended. Dying/
   end
 
-  sandboxed_it "shouldn't quit gracefully on int signal" do
+  it "shouldn't quit gracefully on int signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -45,7 +44,7 @@ describe "Preforker" do
     log.should_not =~ /Main loop ended. Dying/
   end
 
-  sandboxed_it "should add a worker on ttin" do
+  it "should add a worker on ttin" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -58,7 +57,7 @@ describe "Preforker" do
     log.scan(/Child.*Created/).size.should == 3
   end
 
-  sandboxed_it "should remove a worker on ttou" do
+  it "should remove a worker on ttou" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -72,7 +71,7 @@ describe "Preforker" do
     log.scan(/Child.*Exiting/).size.should == 1
   end
 
-  sandboxed_it "should remove all workers on winch" do
+  it "should remove all workers on winch" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -86,7 +85,7 @@ describe "Preforker" do
     log.scan(/Child.*Exiting/).size.should == 2
   end
 
-  sandboxed_it "should keep creating workers when they die" do
+  it "should keep creating workers when they die" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1, :timeout => 0.2) do |master|
       end.start

@@ -1,8 +1,7 @@
 require 'spec_helper'
 
-include FileTestHelper
-describe "Preforker" do
-  sandboxed_it "should kill the master and workers after a quit signal" do
+describe "Preforker", :integration do
+  it "should kill the master and workers after a quit signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -15,7 +14,7 @@ describe "Preforker" do
     `ps aux | grep Preforker | grep -v grep`.should == ""
   end
 
-  sandboxed_it "should kill the master and workers after a term signal" do
+  it "should kill the master and workers after a term signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -28,7 +27,7 @@ describe "Preforker" do
     `ps aux | grep Preforker | grep -v grep`.should == ""
   end
 
-  sandboxed_it "should create a pid file" do
+  it "should create a pid file" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do
       end.start
@@ -37,7 +36,7 @@ describe "Preforker" do
     File.exists?("preforker.pid").should == true
   end
 
-  sandboxed_it "should delete the pid file after a quit signal" do
+  it "should delete the pid file after a quit signal" do
     run_preforker <<-CODE
       Preforker.new do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -48,7 +47,7 @@ describe "Preforker" do
     File.exists?("preforker.pid").should == false
   end
 
-  sandboxed_it "should delete the pid file after a term signal" do
+  it "should delete the pid file after a term signal" do
     run_preforker <<-CODE
       Preforker.new do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -59,7 +58,7 @@ describe "Preforker" do
     File.exists?("preforker.pid").should == false
   end
 
-  sandboxed_it "should gracefully end the worker code when receiving the quit signal" do
+  it "should gracefully end the worker code when receiving the quit signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -74,7 +73,7 @@ describe "Preforker" do
     log.should =~ /Main loop ended. Dying/
   end
 
-  sandboxed_it "should not gracefully end the worker code when receiving the term signal" do
+  it "should not gracefully end the worker code when receiving the term signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -88,7 +87,7 @@ describe "Preforker" do
     log.should_not =~ /Main loop ended. Dying/
   end
 
-  sandboxed_it "shouldn't quit gracefully on int signal" do
+  it "shouldn't quit gracefully on int signal" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -102,7 +101,7 @@ describe "Preforker" do
     log.should_not =~ /Main loop ended. Dying/
   end
 
-  sandboxed_it "should add a worker on ttin" do
+  it "should add a worker on ttin" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -115,7 +114,7 @@ describe "Preforker" do
     log.scan(/Child.*Created/).size.should == 3
   end
 
-  sandboxed_it "should remove a worker on ttou" do
+  it "should remove a worker on ttou" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -129,7 +128,7 @@ describe "Preforker" do
     log.scan(/Child.*Exiting/).size.should == 1
   end
 
-  sandboxed_it "should remove all workers on winch" do
+  it "should remove all workers on winch" do
     run_preforker <<-CODE
       Preforker.new(:workers => 2) do |master|
         sleep 0.1 while master.wants_me_alive?
@@ -143,7 +142,7 @@ describe "Preforker" do
     log.scan(/Child.*Exiting/).size.should == 2
   end
 
-  sandboxed_it "should keep creating workers when they die" do
+  it "should keep creating workers when they die" do
     run_preforker <<-CODE
       Preforker.new(:workers => 1, :timeout => 0.2) do |master|
       end.start

@@ -1,5 +1,10 @@
-module Integration
+require 'file_test_helper'
+
+module IntegrationSupport
+  include FileTestHelper
+
   PREFORKER_LIB_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
+
   def run_preforker(code)
     File.open("test.rb", 'w') do |f|
       f.write <<-TOP
@@ -48,6 +53,16 @@ module Integration
       while File.exists?(pid_file_path) do
         sleep 0.2
       end
+    end
+  end
+end
+
+RSpec.configure do |c|
+  c.include IntegrationSupport, :integration
+  c.around(:each, :integration) do |example|
+    with_files do
+      example.call
+      term_server
     end
   end
 end

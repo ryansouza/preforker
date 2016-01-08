@@ -4,10 +4,12 @@ require 'preforker'
 require 'rspec'
 require 'rspec/autorun'
 require 'rubygems'
-require 'file_test_helper'
+
+RSpec.configure do |c|
+  c.treat_symbols_as_metadata_keys_with_true_values = true
+end
 
 Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f}
 
-include Integration
-RSpec.configure do |config|
+RSpec.configure do |c|
 end
