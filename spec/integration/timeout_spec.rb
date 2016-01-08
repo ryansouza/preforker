@@ -11,8 +11,8 @@ describe "Preforker", :integration do
     sleep 0.3
     term_server
     log = File.read("preforker.log")
-    log.should_not =~ /ERROR.*timeout/
-    log.scan(/Child.*Created/).size.should == 1
+    expect(log).not_to match(/ERROR.*timeout/)
+    expect(log.scan(/Child.*Created/).size).to eq(1)
   end
 
   it "should respawn workers when there's a timeout (master checks once a second max)" do
@@ -25,7 +25,7 @@ describe "Preforker", :integration do
     sleep 1
     term_server
     log = File.read("preforker.log")
-    log.should =~ /ERROR.*timeout/
-    log.scan(/Child.*Created/).size.should > 1
+    expect(log).to match(/ERROR.*timeout/)
+    expect(log.scan(/Child.*Created/).size).to be > 1
   end
 end

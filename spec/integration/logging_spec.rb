@@ -10,7 +10,7 @@ describe "Preforker", :integration do
     CODE
 
     quit_server
-    File.read("test.log").should == "hello\n"
+    expect(File.read("test.log")).to eq("hello\n")
   end
 
   it "should redirect stdout to the null device" do
@@ -22,7 +22,7 @@ describe "Preforker", :integration do
     CODE
 
     quit_server
-    File.exists?("test.log").should == false
+    expect(File.exists?("test.log")).to eq(false)
   end
 
   it "should redirect stderr" do
@@ -35,7 +35,7 @@ describe "Preforker", :integration do
 
     sleep 0.3
     quit_server
-    File.read("test.log").should == "hello\n"
+    expect(File.read("test.log")).to eq("hello\n")
   end
 
   it "should have a default logger file" do
@@ -46,7 +46,7 @@ describe "Preforker", :integration do
     CODE
 
     quit_server
-    File.read("preforker.log").should =~ /Logfile created on/
+    expect(File.read("preforker.log")).to match(/Logfile created on/)
   end
 
   it "should be possible to use the same file for logging, stdout and stderr" do
@@ -61,8 +61,8 @@ describe "Preforker", :integration do
     sleep 0.3
     quit_server
     log = File.read("test.log")
-    log.should =~ /stdout string/
-    log.should =~ /stderr string/
-    log.should =~ /Logfile created on/
+    expect(log).to match(/stdout string/)
+    expect(log).to match(/stderr string/)
+    expect(log).to match(/Logfile created on/)
   end
 end

@@ -11,7 +11,7 @@ describe "Preforker", :integration do
     CODE
 
     quit_server
-    `ps aux | grep Preforker | grep -v grep`.should == ""
+    expect(`ps aux | grep Preforker | grep -v grep`).to eq("")
   end
 
   it "should kill the master and workers after a term signal" do
@@ -24,7 +24,7 @@ describe "Preforker", :integration do
     CODE
 
     term_server
-    `ps aux | grep Preforker | grep -v grep`.should == ""
+    expect(`ps aux | grep Preforker | grep -v grep`).to eq("")
   end
 
   it "should create a pid file" do
@@ -33,7 +33,7 @@ describe "Preforker", :integration do
       end.start
     CODE
 
-    File.exists?("preforker.pid").should == true
+    expect(File.exists?("preforker.pid")).to eq(true)
   end
 
   it "should delete the pid file after a quit signal" do
@@ -44,7 +44,7 @@ describe "Preforker", :integration do
     CODE
 
     quit_server
-    File.exists?("preforker.pid").should == false
+    expect(File.exists?("preforker.pid")).to eq(false)
   end
 
   it "should delete the pid file after a term signal" do
@@ -55,7 +55,7 @@ describe "Preforker", :integration do
     CODE
 
     term_server
-    File.exists?("preforker.pid").should == false
+    expect(File.exists?("preforker.pid")).to eq(false)
   end
 
   it "should gracefully end the worker code when receiving the quit signal" do
@@ -70,7 +70,7 @@ describe "Preforker", :integration do
     sleep 0.3
     quit_server
     log = File.read("preforker.log")
-    log.should =~ /Main loop ended. Dying/
+    expect(log).to match(/Main loop ended. Dying/)
   end
 
   it "should not gracefully end the worker code when receiving the term signal" do
@@ -84,7 +84,7 @@ describe "Preforker", :integration do
 
     term_server
     log = File.read("preforker.log")
-    log.should_not =~ /Main loop ended. Dying/
+    expect(log).not_to match(/Main loop ended. Dying/)
   end
 
   it "shouldn't quit gracefully on int signal" do
@@ -98,7 +98,7 @@ describe "Preforker", :integration do
 
     int_server
     log = File.read("preforker.log")
-    log.should_not =~ /Main loop ended. Dying/
+    expect(log).not_to match(/Main loop ended. Dying/)
   end
 
   it "should add a worker on ttin" do
@@ -111,7 +111,7 @@ describe "Preforker", :integration do
     signal_server(:TTIN)
     sleep 0.5
     log = File.read("preforker.log")
-    log.scan(/Child.*Created/).size.should == 3
+    expect(log.scan(/Child.*Created/).size).to eq(3)
   end
 
   it "should remove a worker on ttou" do
@@ -125,7 +125,7 @@ describe "Preforker", :integration do
     signal_server(:TTOU)
     sleep 0.2
     log = File.read("preforker.log")
-    log.scan(/Child.*Exiting/).size.should == 1
+    expect(log.scan(/Child.*Exiting/).size).to eq(1)
   end
 
   it "should remove all workers on winch" do
@@ -139,7 +139,7 @@ describe "Preforker", :integration do
     signal_server(:WINCH)
     sleep 0.2
     log = File.read("preforker.log")
-    log.scan(/Child.*Exiting/).size.should == 2
+    expect(log.scan(/Child.*Exiting/).size).to eq(2)
   end
 
   it "should keep creating workers when they die" do
@@ -150,6 +150,6 @@ describe "Preforker", :integration do
 
     sleep 0.3
     log = File.read("preforker.log")
-    log.scan(/Child.*Created/).size.should > 1
+    expect(log.scan(/Child.*Created/).size).to be > 1
   end
 end
