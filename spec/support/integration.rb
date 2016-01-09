@@ -18,15 +18,6 @@ module IntegrationSupport
     system("ruby test.rb")
   end
 
-  def sandboxed_it(desc)
-    it desc do
-      with_files do
-        yield
-        term_server
-      end
-    end
-  end
-
   def signal_server(signal)
     Dir['*.pid'].each do |pid_file_path|
       Process.kill(signal, File.read(pid_file_path).to_i)
@@ -61,8 +52,11 @@ RSpec.configure do |c|
   c.include IntegrationSupport, :integration
   c.around(:each, :integration) do |example|
     with_files do
-      example.call
-      term_server
+      begin
+        example.call
+      ensure
+        term_server
+      end
     end
   end
 end
