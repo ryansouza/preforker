@@ -22,7 +22,7 @@ describe "Preforker", :integration do
       end.start
     CODE
 
-    sleep 1
+    sleep 3
     term_server
     log = File.read("preforker.log")
     expect(log).to match(/ERROR.*timeout/)
