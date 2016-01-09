@@ -11,12 +11,8 @@ class Preforker
 
     def trap_deferred(signal)
       trap(signal) do
-        if @signal_queue.size < 5
-          @signal_queue << signal
-          wake_up_master
-        else
-          @master.logger.error "ignoring SIG#{signal}, queue=#{@signal_queue.inspect}"
-        end
+        @signal_queue << signal
+        wake_up_master
       end
     end
 

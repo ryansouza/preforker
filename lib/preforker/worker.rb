@@ -12,6 +12,11 @@ class Preforker
         @worker = worker
         @alive = @worker.tmp
         @last_file_bit = 0
+        @signal_queue = []
+      end
+
+      def signal(signal)
+        @signal_queue << signal
       end
 
       def wants_me_alive?
@@ -20,7 +25,19 @@ class Preforker
           @last_file_bit = 0 == @last_file_bit ? 1 : 0
           @alive.chmod(@last_file_bit)
         end
+
+        handle_signals if @signal_queue.any?
+
         @alive
+      end
+
+      def handle_signals
+        case @signal_queue.shift
+        when :TERM, :INT
+          exit!(0)
+        when :EXIT, :QUIT
+          kill
+        end
       end
 
       def kill
@@ -60,15 +77,11 @@ class Preforker
     end
 
     def handle_signals
-      [:TERM, :INT].each do |sig|
-        trap(sig) { exit!(0) }
+      %i[TERM INT EXIT QUIT].each do |sig|
+        trap(sig){ @master_api.signal(sig) }
       end
 
-      [:EXIT, :QUIT].each do |sig|
-         trap(sig){ @master_api.kill }
-      end
-
-      #what usr1 does
+      # what does usr1 do?
       trap(:USR1) { @read_pipe.close rescue nil }
       trap(:CHLD, 'DEFAULT')
     end
